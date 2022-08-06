@@ -11,6 +11,7 @@ class ImageGallery extends Component {
     images: [],
     page: 1,
     status: '',
+    error: '',
     showLoadMore: false,
   };
 
@@ -19,7 +20,7 @@ class ImageGallery extends Component {
     const { page } = this.state;
 
     if (prevProps.keyWord !== keyWord) {
-      this.setState({ status: 'pending', page: 1 });
+      this.setState({ page: 1, status: 'pending' });
       api(keyWord)
         .then(({ hits, totalHits }) => {
           if (hits.length === 0) {
@@ -46,7 +47,6 @@ class ImageGallery extends Component {
     }
 
     if (prevState.page !== page && page !== 1) {
-      this.setState({ status: 'pending' });
       api(keyWord, page)
         .then(({ hits, totalHits }) => {
           this.setState(prev => ({
@@ -59,10 +59,7 @@ class ImageGallery extends Component {
             this.setState({ showLoadMore: false });
           }
         })
-        .catch(error => {
-          console.log(error);
-          this.setState({ status: '' });
-        });
+        .catch(error => this.setState({ status: 'error', error }));
 
       return;
     }
@@ -73,14 +70,30 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { status, showLoadMore } = this.state;
+    const { status, error, showLoadMore } = this.state;
 
     if (status === 'rejected') {
-      return <div> No images found </div>;
+      return (
+        <div className={s.rejected}>
+          Sorry, there are no images matching your search query. Please try
+          again.
+        </div>
+      );
+    }
+
+    if (status === 'error') {
+      return <div className={s.error}> {error.message} </div>;
     }
 
     if (status === 'pending') {
-      return <ThreeDots color="#00BFFF" height={80} width={80} />;
+      return (
+        <ThreeDots
+          color="#00BFFF"
+          height={80}
+          width={80}
+          ariaLabel="three-dots-loading"
+        />
+      );
     }
 
     if (status === 'resolved') {
