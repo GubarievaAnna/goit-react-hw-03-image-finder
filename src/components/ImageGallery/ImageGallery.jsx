@@ -38,10 +38,7 @@ class ImageGallery extends Component {
             this.setState({ showLoadMore: false });
           }
         })
-        .catch(error => {
-          console.log(error);
-          this.setState({ status: '' });
-        });
+        .catch(error => this.setState({ status: 'error', error }));
 
       return;
     }
@@ -87,15 +84,16 @@ class ImageGallery extends Component {
 
     if (status === 'pending') {
       return (
-        <ThreeDots
-          color="#00BFFF"
-          height={80}
-          width={80}
-          ariaLabel="three-dots-loading"
-        />
+        <div className={s.spinner}>
+          <ThreeDots
+            color="#5d8aa8"
+            height={150}
+            width={150}
+            ariaLabel="three-dots-loading"
+          />
+        </div>
       );
     }
-
     if (status === 'resolved') {
       return (
         <>
