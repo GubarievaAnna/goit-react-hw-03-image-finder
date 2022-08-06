@@ -1,6 +1,9 @@
-import PropTypes from 'prop-types';
 import { Component } from 'react';
+import { createPortal } from 'react-dom';
+import PropTypes from 'prop-types';
 import s from './Modal.module.css';
+
+const container = document.getElementById('modal');
 
 class Modal extends Component {
   componentDidMount() {
@@ -19,12 +22,13 @@ class Modal extends Component {
 
   render() {
     const { src, alt } = this.props;
-    return (
+    return createPortal(
       <div className={s.overlay} onClick={this.onModalClose}>
         <div className={s.modal}>
           <img src={src} alt={alt} />
         </div>
-      </div>
+      </div>,
+      container
     );
   }
 }

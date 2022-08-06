@@ -72,10 +72,6 @@ class ImageGallery extends Component {
       });
   };
 
-  onOpenModal = () => {
-    this.setState({ showModal: true });
-  };
-
   render() {
     const { status, showLoadMore, showModal } = this.state;
 
