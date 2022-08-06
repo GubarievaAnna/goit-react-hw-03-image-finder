@@ -31,7 +31,7 @@ class Searchbar extends Component {
     return (
       <header className={s.searchbar}>
         <form className={s.form} onSubmit={this.onSubmitForm}>
-          <button type="submit" className={s.button}>
+          <button type="submit" className={s.button} aria-label="search">
             <ImSearch />
           </button>
           <input
