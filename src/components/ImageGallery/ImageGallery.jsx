@@ -75,7 +75,7 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { status, error, showLoadMore, loading } = this.state;
+    const { images, status, error, showLoadMore, loading } = this.state;
     return (
       <>
         {status === 'rejected' && (
@@ -88,7 +88,7 @@ class ImageGallery extends Component {
         {status === 'pending' && <Loader />}
         {status === 'resolved' && (
           <ul className={s.gallery}>
-            {this.state.images.map(el => (
+            {images.map(el => (
               <ImageGalleryItem
                 key={el.id}
                 src={el.previewURL}
