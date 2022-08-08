@@ -13,6 +13,7 @@ class ImageGallery extends Component {
     status: '',
     error: '',
     showLoadMore: false,
+    loading: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -58,7 +59,7 @@ class ImageGallery extends Component {
           }
         })
         .catch(error =>
-          this.setState({ status: 'error', error, showLoadMore: false })
+          this.setState({ status: 'error', error, loading: false })
         );
 
       return;
@@ -66,7 +67,11 @@ class ImageGallery extends Component {
   }
 
   changePageQuery = () => {
-    this.setState(prev => ({ page: prev.page + 1, loading: true }));
+    this.setState(prev => ({
+      page: prev.page + 1,
+      loading: true,
+      showLoadMore: false,
+    }));
   };
 
   render() {
