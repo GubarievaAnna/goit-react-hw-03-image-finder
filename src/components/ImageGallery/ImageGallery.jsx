@@ -1,8 +1,8 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ThreeDots } from 'react-loader-spinner';
 import api from '../../utils/api';
 import Button from '../Button/Button.jsx';
+import Loader from '../Loader/Loader.jsx';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem.jsx';
 import s from './ImageGallery.module.css';
 
@@ -85,16 +85,7 @@ class ImageGallery extends Component {
           </div>
         )}
         {status === 'error' && <div className={s.error}> {error.message} </div>}
-        {status === 'pending' && (
-          <div className={s.spinner}>
-            <ThreeDots
-              color="#5d8aa8"
-              height={150}
-              width={150}
-              ariaLabel="three-dots-loading"
-            />
-          </div>
-        )}
+        {status === 'pending' && <Loader />}
         {status === 'resolved' && (
           <ul className={s.gallery}>
             {this.state.images.map(el => (
@@ -107,16 +98,7 @@ class ImageGallery extends Component {
             ))}
           </ul>
         )}
-        {loading && (
-          <div className={s.spinner}>
-            <ThreeDots
-              color="#5d8aa8"
-              height={150}
-              width={150}
-              ariaLabel="three-dots-loading"
-            />
-          </div>
-        )}
+        {loading && <Loader />}
         {showLoadMore && <Button onButtonClick={this.changePageQuery} />}
       </>
     );
