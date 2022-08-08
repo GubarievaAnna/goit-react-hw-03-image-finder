@@ -20,7 +20,7 @@ class ImageGallery extends Component {
     const { page } = this.state;
 
     if (prevProps.keyWord !== keyWord) {
-      this.setState({ page: 1, status: 'pending' });
+      this.setState({ page: 1, status: 'pending', showLoadMore: false });
       api(keyWord)
         .then(({ hits, totalHits }) => {
           if (hits.length === 0) {
@@ -49,6 +49,7 @@ class ImageGallery extends Component {
           this.setState(prev => ({
             images: [...prev.images, ...hits],
             status: 'resolved',
+            loading: false,
             showLoadMore: true,
           }));
 
@@ -56,47 +57,40 @@ class ImageGallery extends Component {
             this.setState({ showLoadMore: false });
           }
         })
-        .catch(error => this.setState({ status: 'error', error }));
+        .catch(error =>
+          this.setState({ status: 'error', error, showLoadMore: false })
+        );
 
       return;
     }
   }
 
   changePageQuery = () => {
-    this.setState(prev => ({ page: prev.page + 1 }));
+    this.setState(prev => ({ page: prev.page + 1, loading: true }));
   };
 
   render() {
-    const { status, error, showLoadMore } = this.state;
-
-    if (status === 'rejected') {
-      return (
-        <div className={s.rejected}>
-          Sorry, there are no images matching your search query. Please try
-          again.
-        </div>
-      );
-    }
-
-    if (status === 'error') {
-      return <div className={s.error}> {error.message} </div>;
-    }
-
-    if (status === 'pending') {
-      return (
-        <div className={s.spinner}>
-          <ThreeDots
-            color="#5d8aa8"
-            height={150}
-            width={150}
-            ariaLabel="three-dots-loading"
-          />
-        </div>
-      );
-    }
-    if (status === 'resolved') {
-      return (
-        <>
+    const { status, error, showLoadMore, loading } = this.state;
+    return (
+      <>
+        {status === 'rejected' && (
+          <div className={s.rejected}>
+            Sorry, there are no images matching your search query. Please try
+            again.
+          </div>
+        )}
+        {status === 'error' && <div className={s.error}> {error.message} </div>}
+        {status === 'pending' && (
+          <div className={s.spinner}>
+            <ThreeDots
+              color="#5d8aa8"
+              height={150}
+              width={150}
+              ariaLabel="three-dots-loading"
+            />
+          </div>
+        )}
+        {status === 'resolved' && (
           <ul className={s.gallery}>
             {this.state.images.map(el => (
               <ImageGalleryItem
@@ -107,10 +101,20 @@ class ImageGallery extends Component {
               />
             ))}
           </ul>
-          {showLoadMore && <Button onButtonClick={this.changePageQuery} />}
-        </>
-      );
-    }
+        )}
+        {loading && (
+          <div className={s.spinner}>
+            <ThreeDots
+              color="#5d8aa8"
+              height={150}
+              width={150}
+              ariaLabel="three-dots-loading"
+            />
+          </div>
+        )}
+        {showLoadMore && <Button onButtonClick={this.changePageQuery} />}
+      </>
+    );
   }
 }
 
