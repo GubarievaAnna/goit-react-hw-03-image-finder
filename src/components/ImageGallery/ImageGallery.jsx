@@ -16,52 +16,46 @@ class ImageGallery extends Component {
     loading: false,
   };
 
+  fetchPhotos = page => {
+    const { keyWord } = this.props;
+
+    this.setState({
+      loading: true,
+      showLoadMore: false,
+    });
+
+    api(keyWord, page)
+      .then(({ hits, totalHits }) => {
+        if (hits.length === 0) {
+          this.setState({ status: 'rejected' });
+          return;
+        }
+
+        this.setState(prev => ({
+          images: [...prev.images, ...hits],
+          status: 'resolved',
+        }));
+
+        Math.ceil(totalHits / 12) === page
+          ? this.setState({ showLoadMore: false })
+          : this.setState({ showLoadMore: true });
+      })
+      .catch(error => this.setState({ status: 'error', error }))
+      .finally(() => this.setState({ loading: false }));
+  };
+
   componentDidUpdate(prevProps, prevState) {
     const { keyWord } = this.props;
     const { page } = this.state;
 
     if (prevProps.keyWord !== keyWord) {
-      this.setState({ page: 1, status: 'pending', showLoadMore: false });
-      api(keyWord)
-        .then(({ hits, totalHits }) => {
-          if (hits.length === 0) {
-            this.setState({ status: 'rejected' });
-            return;
-          }
-
-          this.setState({
-            images: hits,
-            status: 'resolved',
-            showLoadMore: true,
-          });
-
-          if (totalHits <= 12) {
-            this.setState({ showLoadMore: false });
-          }
-        })
-        .catch(error => this.setState({ status: 'error', error }));
-
+      this.setState({ page: 1, images: [], status: '' });
+      this.fetchPhotos(1);
       return;
     }
 
     if (prevState.page !== page && page !== 1) {
-      api(keyWord, page)
-        .then(({ hits, totalHits }) => {
-          this.setState(prev => ({
-            images: [...prev.images, ...hits],
-            status: 'resolved',
-            loading: false,
-            showLoadMore: true,
-          }));
-
-          if (Math.ceil(totalHits / 12) === page) {
-            this.setState({ showLoadMore: false });
-          }
-        })
-        .catch(error =>
-          this.setState({ status: 'error', error, loading: false })
-        );
-
+      this.fetchPhotos(page);
       return;
     }
   }
@@ -69,8 +63,6 @@ class ImageGallery extends Component {
   changePageQuery = () => {
     this.setState(prev => ({
       page: prev.page + 1,
-      loading: true,
-      showLoadMore: false,
     }));
   };
 
@@ -85,7 +77,6 @@ class ImageGallery extends Component {
           </div>
         )}
         {status === 'error' && <div className={s.error}> {error.message} </div>}
-        {status === 'pending' && <Loader />}
         {status === 'resolved' && (
           <ul className={s.gallery}>
             {images.map(el => (
