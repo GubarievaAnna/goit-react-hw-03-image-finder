@@ -12,16 +12,16 @@ class ImageGallery extends Component {
     page: 1,
     status: '',
     error: '',
-    showLoadMore: false,
-    loading: false,
+    isLoadMore: false,
+    isLoading: false,
   };
 
   fetchPhotos = page => {
     const { keyWord } = this.props;
 
     this.setState({
-      loading: true,
-      showLoadMore: false,
+      isLoading: true,
+      isLoadMore: false,
     });
 
     api(keyWord, page)
@@ -37,11 +37,11 @@ class ImageGallery extends Component {
         }));
 
         Math.ceil(totalHits / 12) === page
-          ? this.setState({ showLoadMore: false })
-          : this.setState({ showLoadMore: true });
+          ? this.setState({ isLoadMore: false })
+          : this.setState({ isLoadMore: true });
       })
       .catch(error => this.setState({ status: 'error', error }))
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => this.setState({ isLoading: false }));
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -67,7 +67,7 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { images, status, error, showLoadMore, loading } = this.state;
+    const { images, status, error, isLoadMore, isLoading } = this.state;
     return (
       <>
         {status === 'rejected' && (
@@ -89,8 +89,8 @@ class ImageGallery extends Component {
             ))}
           </ul>
         )}
-        {loading && <Loader />}
-        {showLoadMore && <Button onButtonClick={this.changePageQuery} />}
+        {isLoading && <Loader />}
+        {isLoadMore && <Button onButtonClick={this.changePageQuery} />}
       </>
     );
   }
